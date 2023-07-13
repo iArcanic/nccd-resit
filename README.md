@@ -34,3 +34,14 @@ We have been engaged as a Security Architect and Network Design consultant by Fi
 8. Verify that connectivity is prevented between inappropriate clients and the services they should not be able to access.
 ### 3.5 Augment
 9. Design, implement / configure and test additional features that will usefully enhance the organisation's security posture. You should select features that you consider to be particularly important to FiDo and that will also showcase your comprehensive mastery of security architecture and network defence, above and beyond what you have already demonstrated in tasks 3.1 to 3.4 above.
+
+## 6 Marking scheme
+### 6.1 Phase 1:
+To achieve a mark up to 55% you must:
+1. use the specified file names,
+2. define and implement credible zones of trust. As a minimum, you should have four: untrusted public internet; internet-facing servers; staff workstations; internal-facing servers,
+3. define and implement re-organised IP addressing, using the specified private addresses internally.
+4. implement NAT so that client devices on private IP addresses can interact with services provided on the public internet,
+5. define and implement filters between zones of trust,
+6. partially verify that connectivity is achieved / prevented as appropriate between clients and services,
+7. have hashes at the demonstration that match the hashes in the submission nccd-hashes.sha1 file (ie provide evidence that nothing significant has changed between the submission and the demonstration).
