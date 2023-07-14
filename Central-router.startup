@@ -12,3 +12,7 @@ ip link set up dev eth1
 # Gateway IP for External-switch
 ip addr add 10.0.2.1/24 dev eth2
 ip link set up dev eth2
+
+# Gateway IP for Staff-switch
+ip addr add 10.0.3.1/24 dev eth3
+ip link set up dev eth3
