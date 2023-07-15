@@ -4,3 +4,8 @@ ip link set up dev eth0
 
 # Gateway IP to Services-switch
 ip route add default via 10.0.4.2 dev eth0
+
+# Start apache2 web server
+a2enmod ssl
+a2ensite default-ssl
+systemctl start apache2
