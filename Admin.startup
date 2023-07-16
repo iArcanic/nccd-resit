@@ -1,0 +1,6 @@
+# IP of Admin
+ip addr add 10.0.6.3/24 dev eth0
+ip link set up dev eth0
+
+# Gateway IP to Management-switch
+ip route add default via 10.0.6.2 dev eth0

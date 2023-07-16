@@ -24,3 +24,7 @@ ip link set up dev eth4
 # Gateway IP for Server-switch
 ip addr add 10.0.5.1/24 dev eth5
 ip link set up dev eth5
+
+# Gateway IP for Management-switch
+ip addr add 10.0.6.1/24 dev eth6
+ip link set up dev eth6
