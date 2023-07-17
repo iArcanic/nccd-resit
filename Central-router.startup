@@ -32,5 +32,10 @@ ip link set up dev eth6
 # Enable IP forwarding
 sysctl -w net.ipv4.ip_forward=1
 
+# NAT rules
+
+# Reject NAT for Management subnet
+iptables -t nat -A POSTROUTING -s 10.0.6.0/24 -o eth0 -j ACCEPT
+
 # Enable NAT forwarding
 iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
