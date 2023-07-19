@@ -32,10 +32,30 @@ ip link set up dev eth6
 # Enable IP forwarding
 sysctl -w net.ipv4.ip_forward=1
 
-# NAT rules
+# NAT
 
 # Reject NAT for Management subnet
 iptables -t nat -A POSTROUTING -s 10.0.6.0/24 -o eth0 -j ACCEPT
 
-# Enable NAT forwarding
+# Reject NAT for LDAP
+iptables -t nat -A POSTROUTING -s 10.0.5.3/24 -o eth0 -j ACCEPT
+
+# Source NAT rules
 iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+
+# Destination NAT rules
+
+# Ext-Office
+iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 80 -j DNAT --to-destination 10.0.2.3:80
+
+# Ext-DNS
+iptables -t nat -A PREROUTING -i eth0 -p udp --dport 53 -j DNAT --to-destination 10.0.2.4:53
+
+# Ext-WWW
+iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 80 -j DNAT --to-destination 10.0.2.5:80
+
+# Int-WWW
+iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 80 -j DNAT --to-destination 10.0.4.3:80
+
+# Int-DNS
+iptables -t nat -A PREROUTING -i eth0 -p udp --dport 53 -j DNAT --to-destination 10.0.4.4:53
