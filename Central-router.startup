@@ -57,3 +57,13 @@ iptables -A FORWARD -i eth3 -o eth1 -s 10.0.3.0/24 -d 10.0.1.0/24 -p icmp --icmp
 iptables -A FORWARD -i eth4 -o eth1 -s 10.0.4.0/24 -d 10.0.1.0/24 -p icmp --icmp-type 8 -j DROP
 iptables -A FORWARD -i eth5 -o eth1 -s 10.0.5.0/24 -d 10.0.1.0/24 -p icmp --icmp-type 8 -j DROP
 iptables -A FORWARD -i eth6 -o eth1 -s 10.0.6.0/24 -d 10.0.1.0/24 -p icmp --icmp-type 8 -j DROP
+
+# Allow incoming ICMP Echo Request (ping) from External subnet to specific machines in Server subnet
+iptables -A FORWARD -s 10.0.2.0/24 -d 10.0.5.2 -p icmp --icmp-type 8 -m state --state NEW,ESTABLISHED -j ACCEPT
+iptables -A FORWARD -s 10.0.2.0/24 -d 10.0.5.4 -p icmp --icmp-type 8 -m state --state NEW,ESTABLISHED -j ACCEPT
+
+# Drop incoming ICMP Echo Request (ping) from External to LDAP (for all other machines in External subnet)
+iptables -A FORWARD -s 10.0.2.0/24 -d 10.0.5.3 -p icmp --icmp-type 8 -m state --state NEW,ESTABLISHED -j DROP
+
+# Drop incoming ICMP Echo Request (ping) from LDAP to External subnet
+iptables -A FORWARD -s 10.0.5.3 -d 10.0.2.0/24 -p icmp --icmp-type 8 -m state --state NEW,ESTABLISHED -j DROP
