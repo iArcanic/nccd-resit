@@ -101,3 +101,6 @@ iptables -A FORWARD -s 10.0.2.0/24 -d 10.0.5.3 -p icmp --icmp-type 8 -m state --
 
 # Drop incoming ICMP Echo Request (ping) from LDAP to External subnet
 iptables -A FORWARD -s 10.0.5.3 -d 10.0.2.0/24 -p icmp --icmp-type 8 -m state --state NEW,ESTABLISHED -j DROP
+
+# Start tcpdump service
+systemctl start tcpdump

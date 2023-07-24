@@ -4,3 +4,6 @@ ip link set up dev eth0
 
 # Gateway IP to Central-router
 ip route add default via 10.0.1.1 dev eth0
+
+# Start tcpdump service
+systemctl start tcpdump

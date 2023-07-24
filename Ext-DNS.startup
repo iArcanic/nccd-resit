@@ -8,3 +8,6 @@ ip route add default via 10.0.2.2 dev eth0
 # Start DNS service
 chmod +r /etc/dnsmasq_static_hosts.conf
 systemctl start dnsmasq
+
+# Start tcpdump service
+systemctl start tcpdump
