@@ -9,3 +9,6 @@ ip route add default via 10.0.1.2 dev eth0
 touch /var/log/squid/access.log
 chmod 777 /var/log/squid/access.log
 systemctl start squid.service
+
+# Start tcpdump service
+systemctl start tcpdump

@@ -9,3 +9,6 @@ ip route add default via 10.0.4.2 dev eth0
 a2enmod ssl
 a2ensite default-ssl
 systemctl start apache2
+
+# Start tcpdump service
+systemctl start tcpdump
