@@ -1,0 +1,13 @@
+# IP of Int-DNS
+ip addr add 10.0.4.4/24 dev eth0
+ip link set up dev eth0
+
+# Gateway IP to Services-switch
+ip route add default via 10.0.4.2 dev eth0
+
+# Start DNS service
+chmod +r /etc/dnsmasq_static_hosts.conf
+systemctl start dnsmasq
+
+# Start tcpdump service
+systemctl start tcpdump

@@ -1,0 +1,106 @@
+# IP of Central-router
+ip addr add 192.168.0.2/24 dev eth0
+ip link set up dev eth0
+
+# Gateway IP to Internet
+ip route add default via 192.168.0.1 dev eth0
+
+# Gateway IP for DMZ-switch
+ip addr add 10.0.1.1/24 dev eth1
+ip link set up dev eth1
+
+# Gateway IP for External-switch
+ip addr add 10.0.2.1/24 dev eth2
+ip link set up dev eth2
+
+# Gateway IP for Staff-switch
+ip addr add 10.0.3.1/24 dev eth3
+ip link set up dev eth3
+
+# Gateway IP for Services-switch
+ip addr add 10.0.4.1/24 dev eth4
+ip link set up dev eth4
+
+# Gateway IP for Server-switch
+ip addr add 10.0.5.1/24 dev eth5
+ip link set up dev eth5
+
+# Gateway IP for Management-switch
+ip addr add 10.0.6.1/24 dev eth6
+ip link set up dev eth6
+
+# Enable IP forwarding
+sysctl -w net.ipv4.ip_forward=1
+
+# NAT
+
+# Reject NAT for Management subnet
+iptables -t nat -A POSTROUTING -s 10.0.6.0/24 -o eth0 -j ACCEPT
+
+# Reject NAT for Services subnet
+iptables -t nat -A POSTROUTING -s 10.0.4.0/24 -o eth0 -j ACCEPT
+
+# Source NAT rules
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+
+# Destination NAT rules
+
+# Ext-Office
+iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 80 -j DNAT --to-destination 10.0.2.3:80
+
+# Ext-DNS
+iptables -t nat -A PREROUTING -i eth0 -p udp --dport 53 -j DNAT --to-destination 10.0.2.4:53
+
+# Ext-WWW
+iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 80 -j DNAT --to-destination 10.0.2.5:80
+
+# Int-WWW
+iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 80 -j DNAT --to-destination 10.0.4.3:80
+
+# Int-DNS
+iptables -t nat -A PREROUTING -i eth0 -p udp --dport 53 -j DNAT --to-destination 10.0.4.4:53
+
+# OpenVPN
+iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 1194 -j DNAT --to-destination 10.0.5.4:1194
+
+# Firewall rules
+
+# Allow outgoing ICMP Echo Request (ping) from Management subnet to all other subnets
+iptables -A FORWARD -i eth6 -o eth2 -s 10.0.6.0/24 -d 10.0.2.0/24 -p icmp --icmp-type 8 -j ACCEPT
+iptables -A FORWARD -i eth6 -o eth3 -s 10.0.6.0/24 -d 10.0.3.0/24 -p icmp --icmp-type 8 -j ACCEPT
+iptables -A FORWARD -i eth6 -o eth4 -s 10.0.6.0/24 -d 10.0.4.0/24 -p icmp --icmp-type 8 -j ACCEPT
+iptables -A FORWARD -i eth6 -o eth5 -s 10.0.6.0/24 -d 10.0.5.0/24 -p icmp --icmp-type 8 -j ACCEPT
+
+# Drop incoming ICMP Echo Request (ping) from all other subnets to Management subnet
+iptables -A FORWARD -i eth1 -o eth6 -s 10.0.1.0/24 -d 10.0.6.0/24 -p icmp --icmp-type 8 -j DROP
+iptables -A FORWARD -i eth2 -o eth6 -s 10.0.2.0/24 -d 10.0.6.0/24 -p icmp --icmp-type 8 -j DROP
+iptables -A FORWARD -i eth3 -o eth6 -s 10.0.3.0/24 -d 10.0.6.0/24 -p icmp --icmp-type 8 -j DROP
+iptables -A FORWARD -i eth4 -o eth6 -s 10.0.4.0/24 -d 10.0.6.0/24 -p icmp --icmp-type 8 -j DROP
+iptables -A FORWARD -i eth5 -o eth6 -s 10.0.5.0/24 -d 10.0.6.0/24 -p icmp --icmp-type 8 -j DROP
+
+# Drop outgoing ICMP Echo Request (ping) from DMZ subnet to all other subnets
+iptables -A FORWARD -i eth1 -o eth2 -s 10.0.1.0/24 -d 10.0.2.0/24 -p icmp --icmp-type 8 -j DROP
+iptables -A FORWARD -i eth1 -o eth3 -s 10.0.1.0/24 -d 10.0.3.0/24 -p icmp --icmp-type 8 -j DROP
+iptables -A FORWARD -i eth1 -o eth4 -s 10.0.1.0/24 -d 10.0.4.0/24 -p icmp --icmp-type 8 -j DROP
+iptables -A FORWARD -i eth1 -o eth5 -s 10.0.1.0/24 -d 10.0.5.0/24 -p icmp --icmp-type 8 -j DROP
+iptables -A FORWARD -i eth1 -o eth6 -s 10.0.1.0/24 -d 10.0.6.0/24 -p icmp --icmp-type 8 -j DROP
+
+# Drop incoming ICMP Echo Request (ping) from all other subnets to DMZ subnet
+iptables -A FORWARD -i eth2 -o eth1 -s 10.0.2.0/24 -d 10.0.1.0/24 -p icmp --icmp-type 8 -j DROP
+iptables -A FORWARD -i eth3 -o eth1 -s 10.0.3.0/24 -d 10.0.1.0/24 -p icmp --icmp-type 8 -j DROP
+iptables -A FORWARD -i eth4 -o eth1 -s 10.0.4.0/24 -d 10.0.1.0/24 -p icmp --icmp-type 8 -j DROP
+iptables -A FORWARD -i eth5 -o eth1 -s 10.0.5.0/24 -d 10.0.1.0/24 -p icmp --icmp-type 8 -j DROP
+iptables -A FORWARD -i eth6 -o eth1 -s 10.0.6.0/24 -d 10.0.1.0/24 -p icmp --icmp-type 8 -j DROP
+
+# Allow incoming ICMP Echo Request (ping) from External subnet to specific machines in Server subnet
+iptables -A FORWARD -s 10.0.2.0/24 -d 10.0.5.2 -p icmp --icmp-type 8 -m state --state NEW,ESTABLISHED -j ACCEPT
+iptables -A FORWARD -s 10.0.2.0/24 -d 10.0.5.4 -p icmp --icmp-type 8 -m state --state NEW,ESTABLISHED -j ACCEPT
+
+# Drop incoming ICMP Echo Request (ping) from External to LDAP (for all other machines in External subnet)
+iptables -A FORWARD -s 10.0.2.0/24 -d 10.0.5.3 -p icmp --icmp-type 8 -m state --state NEW,ESTABLISHED -j DROP
+
+# Drop incoming ICMP Echo Request (ping) from LDAP to External subnet
+iptables -A FORWARD -s 10.0.5.3 -d 10.0.2.0/24 -p icmp --icmp-type 8 -m state --state NEW,ESTABLISHED -j DROP
+
+# Start tcpdump service
+systemctl start tcpdump
